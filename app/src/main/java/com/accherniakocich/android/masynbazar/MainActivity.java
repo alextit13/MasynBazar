@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Do something on page loading started
+                mRelativeLayout.setAlpha(.3f);
                 progress_bar.setVisibility(View.VISIBLE);
             }
 
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 // Do something when page loading finished
 
                 progress_bar.setVisibility(View.INVISIBLE);
+                mRelativeLayout.setAlpha(1);
 
                 // Check web view back history availability
                 if(mWebView.canGoBack()){
