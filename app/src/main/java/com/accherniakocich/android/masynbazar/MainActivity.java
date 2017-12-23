@@ -15,20 +15,25 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.wang.avi.AVLoadingIndicatorView;
+
 public class MainActivity extends AppCompatActivity {
+
+    private AVLoadingIndicatorView avi;
 
     private Context mContext;
     private Activity mActivity;
 
-    private RelativeLayout mRelativeLayout;
+    private FrameLayout mRelativeLayout;
     private ImageButton mButtonBack;
     private ImageButton mButtonForward;
-    private ProgressBar progress_bar;
+    //private ProgressBar progress_bar;
     static WebView mWebView;
 
 
@@ -55,11 +60,12 @@ public class MainActivity extends AppCompatActivity {
         );*/
 
         // Get the widgets reference from XML layout
-        mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
+        mRelativeLayout = (FrameLayout) findViewById(R.id.rl);
         mWebView = (WebView) findViewById(R.id.web_view);
         mButtonBack = (ImageButton) findViewById(R.id.btn_back);
         mButtonForward = (ImageButton) findViewById(R.id.btn_forward);
-        progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+        //progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+        avi = (AVLoadingIndicatorView)findViewById(R.id.avi);
 
         // Request to render the web page
         renderWebPage(mUrl);
@@ -146,14 +152,16 @@ public class MainActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // Do something on page loading started
                 mRelativeLayout.setAlpha(.3f);
-                progress_bar.setVisibility(View.VISIBLE);
+                //progress_bar.setVisibility(View.VISIBLE);
+                avi.show();
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 // Do something when page loading finished
 
-                progress_bar.setVisibility(View.INVISIBLE);
+                //progress_bar.setVisibility(View.INVISIBLE);
+                avi.hide();
                 mRelativeLayout.setAlpha(1);
 
                 // Check web view back history availability
