@@ -1,18 +1,24 @@
 package com.accherniakocich.android.masynbazar;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,12 +26,16 @@ public class MainActivity extends AppCompatActivity {
     private Activity mActivity;
 
     private RelativeLayout mRelativeLayout;
-    private WebView mWebView;
     private ImageButton mButtonBack;
     private ImageButton mButtonForward;
     private ProgressBar progress_bar;
+    static WebView mWebView;
 
-    private String mUrl="https://mashynbazar.000webhostapp.com/";
+
+    private String mUrl = "http://mashynbazar.biz/";
+    private ValueCallback<Uri[]> mFilePathCallback;
+    private int PICKFILE_REQUEST_CODE= 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView = (WebView) findViewById(R.id.web_view);
         mButtonBack = (ImageButton) findViewById(R.id.btn_back);
         mButtonForward = (ImageButton) findViewById(R.id.btn_forward);
-        progress_bar = (ProgressBar)findViewById(R.id.progress_bar);
+        progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Request to render the web page
         renderWebPage(mUrl);
@@ -101,6 +111,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mWebView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback,FileChooserParams fileChooserParams) {
+                mFilePathCallback = filePathCallback;
+                // Launch Intent for picking file
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+                return true;
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == PICKFILE_REQUEST_CODE) {
+            Uri result = intent == null || resultCode != RESULT_OK ? null
+                    : intent.getData();
+            Uri[] resultsArray = new Uri[1];
+            resultsArray[0] = result;
+            mFilePathCallback.onReceiveValue(resultsArray);
+        }
     }
 
     // Custom method to render a web page
@@ -121,16 +157,16 @@ public class MainActivity extends AppCompatActivity {
                 mRelativeLayout.setAlpha(1);
 
                 // Check web view back history availability
-                if(mWebView.canGoBack()){
+                if (mWebView.canGoBack()) {
                     mButtonBack.setEnabled(true);
-                }else {
+                } else {
                     mButtonBack.setEnabled(false);
                 }
 
                 // Check web view forward history availability
-                if(mWebView.canGoForward()){
+                if (mWebView.canGoForward()) {
                     mButtonForward.setEnabled(true);
-                }else {
+                } else {
                     mButtonForward.setEnabled(false);
                 }
             }
@@ -156,13 +192,13 @@ public class MainActivity extends AppCompatActivity {
             do whatever you want.
     */
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         //Toast.makeText(mContext,"Back Key Pressed",Toast.LENGTH_SHORT).show();
         // We also allow to navigate back history by pressing device back key
-        if(mWebView.canGoBack()){
+        if (mWebView.canGoBack()) {
             //Toast.makeText(mContext,"Back History Available",Toast.LENGTH_SHORT).show();
             mWebView.goBack();
-        }else {
+        } else {
             //Toast.makeText(mContext,"No Back History Found",Toast.LENGTH_SHORT).show();
             super.onBackPressed();
         }
